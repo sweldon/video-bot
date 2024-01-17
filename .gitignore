@@ -1,0 +1,6 @@
+*.code-workspace
+*.pyc
+images/*
+venv/*
+output/*
+__pycache__/*
