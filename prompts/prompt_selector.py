@@ -22,7 +22,6 @@ class PromptSelector:
 
     def __init__(self, sqllite_path):
         self.sqllite_path = sqllite_path
-        print(self.sqllite_path)
 
     def select_prompt(self):
         prompt = None
