@@ -10,7 +10,7 @@ import argparse
 from prompts.prompt_selector import PromptSelector
 from speech.speaker import Speaker
 from video.video_maker import VideoMaker
-from video.captioner import DubbedVideoManager, Utility, SubtitleGenerator
+from video.captioner import DubbedVideoManager, SubtitleGenerator
 import os
 import shutil
 from clients.giphy import GiphyClient

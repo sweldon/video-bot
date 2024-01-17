@@ -20,20 +20,12 @@ class DubbedVideoManager:
         self.extract_audio()
 
     def extract_audio(self) -> None:
-        
         if self.video.audio is not None:
             temp_file = "%s.mp3" % os.path.join(self.title_dir, 'temp')
             self.video.audio.write_audiofile(temp_file, codec="mp3")
         else:
-            print("video has no audio, quitting")
-
-
-class Utility:
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-    def file_exists(self) -> bool:
-        return len(self.path) > 0 and os.path.exists(path=self.path)
+            print("Video has no audio, quitting")
+            exit(1)
 
 
 class SubtitleGenerator:
@@ -52,6 +44,7 @@ class SubtitleGenerator:
         transcribe = model.transcribe(audio=temp_file, fp16=False)
         segments = transcribe["segments"]
 
+        # Write caption segments to a file, based on input audio
         for seg in segments:
             start_secs = timedelta(seconds=int(seg["start"]))
             end_secs =  timedelta(seconds=int(seg["end"]))
@@ -64,6 +57,9 @@ class SubtitleGenerator:
                 f.write(segment)
 
     def attach(self) -> None:
+        """
+        Generates subtitles and attaches them to a video
+        """
         self.generate()
         if os.path.exists(self.output_srt):
             subtitles = SubtitlesClip(

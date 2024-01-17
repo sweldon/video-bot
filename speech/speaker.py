@@ -7,7 +7,6 @@ from gtts import gTTS
 import os  
 from mutagen.mp3 import MP3
 import os
-import shutil
 from pydub import AudioSegment
 
 class Speaker:

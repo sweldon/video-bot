@@ -4,13 +4,8 @@ them into a video. Also resizes to an HD height and then crops it
 to a popular social media aspect ratio (9:16)
 """
 
-import cv2
 import os
 import moviepy.editor as mp
-import math
-from moviepy.video.tools.subtitles import SubtitlesClip
-import shutil
-from moviepy.editor import VideoFileClip, CompositeVideoClip
 from moviepy.video.fx.all import crop
 
 class VideoMaker:
