@@ -20,7 +20,8 @@ class Poster:
     def generate_post(
             self,
             sqllite_path,
-            output_dir
+            output_dir,
+            reuse_prompts
         ):
 
         # Get a random prompt
@@ -58,17 +59,21 @@ class Poster:
         subtitle_generator = SubtitleGenerator(videomanager, title_dir)
         subtitle_generator.attach()
 
-        # Mark this video as used, completed successfully
-        prompt_selector.mark_as_used(title)
+        # Mark this video as used, completed successfully, if applicable
+        if reuse_prompts is False:
+            print("Video successfully generated, flagging as used...")
+            prompt_selector.mark_as_used(title)
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--sqllite_path', type=str, required=True)
 parser.add_argument('--output_dir', type=str, required=True)
+parser.add_argument('--reuse_prompts', type=bool, action='store_true')
 args = parser.parse_args()
 
 poster = Poster()
 post = poster.generate_post(
     sqllite_path=args.sqllite_path,
-    output_dir=args.output_dir
+    output_dir=args.output_dir,
+    reuse_prompts=args.reuse_prompts
 )
