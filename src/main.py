@@ -68,7 +68,7 @@ class Poster:
 parser = argparse.ArgumentParser()
 parser.add_argument('--sqllite_path', type=str, required=True)
 parser.add_argument('--output_dir', type=str, required=True)
-parser.add_argument('--reuse_prompts', type=bool, action='store_true')
+parser.add_argument('--reuse_prompts', action='store_true')
 args = parser.parse_args()
 
 poster = Poster()
