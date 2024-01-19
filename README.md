@@ -30,9 +30,10 @@ gTTS, and finally combines them into a video
     ```
     - If you're on Windows using WSL2, move the SQLite database (`data/post_prompts.db`) to a Windows directory
 
-1. [Optional] Install 'Heavitas' font: https://www.dafont.com/heavitas.font
+1. [Optional] Install 'Heavitas' font
     - Ubuntu/WSL2
-        - Copy the .ttf to `/usr/local/share/fonts/` 
+        - Copy `fonts/Heavitas.ttf` to `/usr/local/share/fonts/`
+            - Can also be downloaded from https://www.dafont.com/heavitas.font
         - Run `sudo fc-cache -f -v` to refresh the fonts
 
 1. Generate a vid!
