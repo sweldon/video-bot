@@ -21,11 +21,12 @@ class Poster:
             self,
             sqllite_path,
             output_dir,
-            reuse_prompts
+            reuse_prompts,
+            title
         ):
 
         # Get a random prompt
-        prompt_selector = PromptSelector(sqllite_path)
+        prompt_selector = PromptSelector(sqllite_path, title)
         title, prompt = prompt_selector.select_prompt()
 
         # If the directory already exists, blow it away and start over
@@ -68,12 +69,14 @@ class Poster:
 parser = argparse.ArgumentParser()
 parser.add_argument('--sqllite_path', type=str, required=True)
 parser.add_argument('--output_dir', type=str, required=True)
-parser.add_argument('--reuse_prompts', action='store_true')
+parser.add_argument('--reuse_prompts', action='store_false')
+parser.add_argument('--title', type=str)
 args = parser.parse_args()
 
 poster = Poster()
 post = poster.generate_post(
     sqllite_path=args.sqllite_path,
     output_dir=args.output_dir,
-    reuse_prompts=args.reuse_prompts
+    reuse_prompts=args.reuse_prompts,
+    title=args.title
 )

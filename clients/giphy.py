@@ -9,6 +9,8 @@ from urllib import parse, request
 import requests
 import os
 import random
+import time
+
 
 class GiphyClient:
     
@@ -29,6 +31,8 @@ class GiphyClient:
         self.download_type = download_type
         self.query = query
         self.rating = rating
+        self.max_attempts = 20
+
         self.params = parse.urlencode({
             "q": query,
             "api_key": self.api_key,
@@ -37,22 +41,28 @@ class GiphyClient:
         })
 
     def get_background(self, title_dir, title):
-        random_index = random.randint(0, self.search_limit - 1)
 
-        with request.urlopen("".join((self.endpoint, "?", self.params))) as response:
-            results = json.loads(response.read())
+        attempts = 1
+        while True:
+            random_index = random.randint(0, self.search_limit - 1)
 
-        try:
-            image_url = results["data"][random_index]["images"][self.download_type][self.download_format]
-            print("using GIF/MP4:", image_url)
-        except IndexError:
-            print(
-                f"[GIPHY ERROR] Could not find any {self.download_format} results for query {self.query} "
-                "Usually just running this again will fix it, otherwise change the query of the GiphyClient "
-                "i.e. GiphyClient(query='something else')"
-            )
-            exit(1)
+            with request.urlopen("".join((self.endpoint, "?", self.params))) as response:
+                results = json.loads(response.read())
 
+            try:
+                image_url = results["data"][random_index]["images"][self.download_type][self.download_format]
+                print("using GIF/MP4:", image_url)
+                break
+            except IndexError:
+                print(
+                    f"[GIPHY ERROR] Could not find any {self.download_format} results for query '{self.query}'... "
+                    f"Trying again! ({attempts}/{self.max_attempts} attempts)"
+                )
+                if attempts > self.max_attempts:
+                    print("Max attempts reached, exiting. Please try again later.")
+                    exit(1)
+                attempts += 1
+                time.sleep(1)
         img_data = requests.get(image_url).content
         gif_path = "%s.%s" % (os.path.join(title_dir, title+"_bg"), self.download_format)
         with open(gif_path, 'wb') as handler:

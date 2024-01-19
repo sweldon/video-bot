@@ -20,16 +20,19 @@ def prompt_db_manager(db_path):
 
 class PromptSelector:
 
-    def __init__(self, sqllite_path):
+    def __init__(self, sqllite_path, title=None):
         self.sqllite_path = sqllite_path
+        self.title=title
 
     def select_prompt(self):
         prompt = None
 
         with prompt_db_manager(self.sqllite_path) as prompt_cursor:
-            res = prompt_cursor.cursor().execute(
-                "SELECT title, content FROM prompts where content != '' and used != 1 ORDER BY RANDOM() LIMIT 1;"
-            )
+            if self.title is not None:
+                query = f"SELECT title, content FROM prompts where title='{self.title}'"
+            else:
+                query = "SELECT title, content FROM prompts where content != '' and used != 1 ORDER BY RANDOM() LIMIT 1;"
+            res = prompt_cursor.cursor().execute(query)
             title, prompt = res.fetchone()
             
         return title, prompt

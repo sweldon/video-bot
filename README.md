@@ -10,27 +10,32 @@ gTTS, and finally combines them into a video
     python3 -m venv venv && source venv/bin/activate
     ```
 
-2. Install Python requirements
+1. Install Python requirements
 
     ```
     pip install -r requirements.txt &&
-    pip install git+https://github.com/openai/whisper.git
+    pip install stable-ts
     ```
 
-3. Install Ubuntu packages
+1. Install Ubuntu packages
 
     ```
     sudo apt-get install imagemagick ffmpeg
     ```
-    3a. Tweak Imagemagick config: https://askubuntu.com/a/879784
+    - Tweak Imagemagick config: https://askubuntu.com/a/879784
 
-4. Create video output directory in root directory of this project
+1. Create video output directory in root directory of this project
     ```
     mkdir output
     ```
-    4a. If you're on Windows using WSL2, move the SQLite database (`data/post_prompts.db`) to a Windows directory
+    - If you're on Windows using WSL2, move the SQLite database (`data/post_prompts.db`) to a Windows directory
 
-5. Generate a vid!
+1. [Optional] Install 'Heavitas' font: https://www.dafont.com/heavitas.font
+    - Ubuntu/WSL2
+        - Copy the .ttf to `/usr/local/share/fonts/` 
+        - Run `sudo fc-cache -f -v` to refresh the fonts
+
+1. Generate a vid!
     ```
     export GIPHY_API_KEY="<insert api key here>" && python3 src/main.py --sqllite_path '/path/to/post_prompts.db' --output_dir 'output/'
     ```

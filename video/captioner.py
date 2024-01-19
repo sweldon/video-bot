@@ -1,17 +1,11 @@
 """
-Setup notes for adding captions:
-1. Ubuntu: Install ffmpeg, imagemagick (via sudo apt install)
-2. Python: Install python whisper using:
-    pip install git+https://github.com/openai/whisper.git
-4. Comment appropriate lines: https://askubuntu.com/a/879784
+Generates and attaches captions to the video
 """
 
 import os
-from datetime import timedelta
-import whisper
 from moviepy.editor import VideoFileClip, CompositeVideoClip, TextClip
 from moviepy.video.tools.subtitles import SubtitlesClip
-
+import stable_whisper
 
 class DubbedVideoManager:
     def __init__(self, dubbed_video, title_dir) -> None:
@@ -37,91 +31,55 @@ class SubtitleGenerator:
         self.video_width, self.video_height = self.videomanager.video.size
         self.video_size = self.videomanager.video.size
         self.stroked_subtitles = []
-        self.font_size = 60
+        self.font_size = 48
         self.font_color = 'white'
-        self.font_face = 'Arial-bold'
-        self.stroke_width = 10
+        self.font_face = 'Heavitas'
+        self.stroke_width = 3
         self.stroke_color = 'black'
 
     def generate(self) -> None:
 
-        model = whisper.load_model("base")
+        # model = whisper.load_model("base")
         temp_file = "%s.mp3" % os.path.join(self.title_dir, 'temp')
-        transcribe = model.transcribe(audio=temp_file, fp16=False)
-        segments = transcribe["segments"]
 
-        # Transcribe audio and write caption segments to a file
-        with open(self.output_srt, "w", encoding="utf-8") as f:
-            
-            for seg in segments:
-                start_time = seg["start"]
-                end_time = seg["end"]
 
-                start_secs = timedelta(seconds=int(start_time))
-                end_secs =  timedelta(seconds=int(end_time))
-                start = (str(0) + str(start_secs) + ",000")
-                end = str(0) + str(end_secs) + ",000"
-                text = seg["text"]
-                segment_id = seg["id"] + 1
-                segment = f"{segment_id}\n{start} --> {end}\n{text[1:] if text[0] == ' ' else text}\n\n"
+        model = stable_whisper.load_model('base')
+        result = model.transcribe(temp_file)
 
-                # Write segment to subtitle SRT file
-                f.write(segment)
-
-                # Since out-of-the-box stroke is bad, do some custom magic to add nice-looking subtitle outlining
-                duration = float(end_time) - float(start_time)
-                subtitle_x_position = "center"
-                subtitle_y_position = self.video_height * 4/9
-
-                # Create a TextClip to act as the outline, i.e. stroke. This will be combined with a regular TextClip
-                # to present a nice outline
-                text_clip_stroke = TextClip(
-                    seg["text"],
-                    fontsize=self.font_size,
-                    color=self.font_color,
-                    font=self.font_face,
-                    stroke_width=self.stroke_width,
-                    stroke_color=self.stroke_color,
-                    size=(self.video_width*1/2, self.video_height*1/2),
-                    method='caption',
-                    align='center',
-                ).set_duration(duration)
-                # Align the text clip with the subtitle segment
-                text_clip_stroke = text_clip_stroke.set_start(float(start_time))
-                text_clip_stroke = text_clip_stroke.set_position((subtitle_x_position, subtitle_y_position))
-
-                # Create the regular text clip, outlined by the layer above (stroked TextClip)
-                text_clip = TextClip(
-                    seg["text"],
-                    fontsize=self.font_size,
-                    color=self.font_color,
-                    font=self.font_face,
-                    size=(self.video_width*1/2, self.video_height*1/2),
-                    method='caption',
-                    align='center',
-                ).set_duration(duration)
-
-                # Align the text clip with the subtitle segment
-                text_clip = text_clip.set_start(float(start_time))
-                text_clip = text_clip.set_position((subtitle_x_position, subtitle_y_position))
-
-                # Combine the stroke text clip with the normal text clip
-                stroked_text_clip = CompositeVideoClip([text_clip_stroke, text_clip], size=self.video_size)
-                # Queue all of the clips up to be combined with the video, via self.generate
-                self.stroked_subtitles.append(stroked_text_clip)
+        result.to_srt_vtt(self.output_srt, segment_level=False, word_level=True)
+        # There is a bug in moviepy SubtitlesClip where if there arent 2 lines at
+        # the bottom of the SRT, the subtitles wont be shown in the video.
+        with open(self.output_srt, "a", encoding="utf-8") as f:
+            f.write("\n\n")
 
     def attach(self) -> None:
         """
         Attaches generated (self.generate) subtitles to a video
         """
+        # Generate the captions
         self.generate()
-        if os.path.exists(self.output_srt):
 
+        if os.path.exists(self.output_srt):
+            # Combine the video with the captions
+            subtitles = SubtitlesClip(
+                self.output_srt,
+                lambda txt: TextClip(
+                txt,
+                fontsize=self.font_size,
+                color=self.font_color,
+                font=self.font_face,
+                size=(self.video_width, self.video_height*1/2),
+                method='caption',
+                align='center',
+                stroke_width=self.stroke_width,
+                stroke_color=self.stroke_color,
+            ),
+            )
             video_with_subtitles = CompositeVideoClip(
                 [
                     self.videomanager.video,
-                    *self.stroked_subtitles
-                ]
+                    subtitles.set_position(("center", "bottom")),
+                ],
             )
             output_vid = "%s.mp4" % os.path.join(self.title_dir, self.title)
             video_with_subtitles.write_videofile(
@@ -130,4 +88,4 @@ class SubtitleGenerator:
                 fps=self.videomanager.video.fps
             )
 
-            print(f"Final video saved to -> {output_vid}")
+            print(f"Done! Final video saved to -> {output_vid}")
