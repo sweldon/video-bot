@@ -48,7 +48,7 @@ class SubtitleGenerator:
 
         result.to_srt_vtt(self.output_srt, segment_level=False, word_level=True)
         # There is a bug in moviepy SubtitlesClip where if there arent 2 lines at
-        # the bottom of the SRT, the subtitles wont be shown in the video.
+        # the bottom of the SRT, the last line of subtitles wont be shown in the video.
         with open(self.output_srt, "a", encoding="utf-8") as f:
             f.write("\n\n")
 
