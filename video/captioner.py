@@ -31,7 +31,7 @@ class SubtitleGenerator:
         self.video_width, self.video_height = self.videomanager.video.size
         self.video_size = self.videomanager.video.size
         self.stroked_subtitles = []
-        self.font_size = 48
+        self.font_size = 36
         self.font_color = 'white'
         self.font_face = 'Heavitas'
         self.stroke_width = 3
@@ -84,5 +84,6 @@ class SubtitleGenerator:
                 bitrate="10000k",
                 fps=self.videomanager.video.fps
             )
-
+            
             print(f"Done! Final video saved to -> {output_vid}")
+            return output_vid

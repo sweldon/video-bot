@@ -14,17 +14,11 @@ class PexelsClient:
     def __init__(
         self,
         endpoint = "https://api.pexels.com/videos/search",
-        search_limit = 80,
+        search_limit = 3,
         query = "space",
-        min_width = 720,
-        min_height = 1280
+        min_width = 1280,
+        min_height = 720
     ):
-        """
-        :param size: large(4K), medium(Full HD) or small(HD)
-        :param min_height: Since we are making HD portrait (vertical) vids for social
-            media, want an HD height of 1280. This may seem backwards if you're used to
-            landscape, but we want 720x1280 at least
-        """
         self.endpoint = endpoint
         self.api_key = os.environ["PEXELS_API_KEY"]
         self.search_limit = search_limit
@@ -32,7 +26,6 @@ class PexelsClient:
         self.min_width = min_width
         self.min_height = min_height
         self.max_attempts = 20
-
         self.params = parse.urlencode({
             "query": query,
             "per_page": self.search_limit,
@@ -42,7 +35,6 @@ class PexelsClient:
         opener =request.build_opener()
         opener.addheaders = [('Authorization', self.api_key)]
         request.install_opener(opener)
-        # download_link = f"https://www.pexels.com/download/video/{video_id}/"
         download_link = f"https://www.pexels.com/download/video/{video_id}/?h={height}&w={width}"
         download_path = "%s.mp4" % (os.path.join(output_dir, title+"_bg"))
         request.urlretrieve(download_link, download_path) 
@@ -72,19 +64,19 @@ class PexelsClient:
                 video_id = v["id"]
                 height = v["height"]
                 width = v["width"]
-                # video_path = self.download_video(video_id, output_dir, title, height, width)
                 try:
                     # See if video is available
                     video_path = self.download_video(parent_video_id, output_dir, title, height, width)
                     return video_path
                 except Exception:
-                    print(f"Video file {video_id} (parent {parent_video_id}) unavailable for download, checking for other options...")
+                    print(
+                        f"Video file {video_id} (parent {parent_video_id}) "
+                        "unavailable for download, checking for other options..."
+                    )
 
     def get_background_video(self, output_dir, title):
-
         attempts = 1
-        while True:
-            
+        while True:   
             try:
                 endpoint = "".join((self.endpoint, "?", self.params))
                 results = requests.get(endpoint, headers={'Authorization': self.api_key})
@@ -115,11 +107,23 @@ class PexelsClient:
                     raise(f"Could not find any usable video sizes in video list {video_files_by_size}")
                 break
 
-            except Exception:
+            except Exception as e:
                 print(
                     f"[PEXELS ERROR] There was a problem getting a video for query: '{self.query}'... "
                     f"Trying again! ({attempts}/{self.max_attempts} attempts)"
                 )
+
+                if e.__class__.__name__ == 'ValueError' and self.query != 'space':
+                    # If there were no results for a custom query, fall back to 'space' and expand the search
+                    print(
+                        f"No results found for {self.query}, falling back to default query "
+                        "and expanding the search..."
+                    )
+                    self.params = parse.urlencode({
+                        "query": "space",
+                        "per_page": 20,
+                    })
+
                 if attempts > self.max_attempts:
                     print("Max attempts reached, exiting. Please try again later.")
                     exit(1)

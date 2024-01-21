@@ -50,8 +50,7 @@ gTTS, and finally combines them into a video
 - reuse_prompts: If this flag is provided, videos will not be flagged as used in the database, allowing you to regenerate them. Otherwise, you can only generate a video for a prompt once so theyre not duplicated
 
 ## SQLite Database
-
+- [INT] id
 - [TEXT] title
-- [TEXT] prompt
 - [TEXT] content
 - [BOOL] used

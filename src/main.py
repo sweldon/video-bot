@@ -15,6 +15,8 @@ import os
 import shutil
 from clients.pexels import PexelsClient
 from clients.giphy import GiphyClient
+from utils.helpers import cleanup_video_directory
+
 
 class Poster:
 
@@ -33,6 +35,8 @@ class Poster:
 
         # If the directory already exists, blow it away and start over
         title_dir = f"{output_dir}{title}"
+        final_file_path = f"{title_dir}/{title}.mp4"
+
         if os.path.isdir(title_dir):
             print("Video dir already exists, deleting")
             shutil.rmtree(title_dir)
@@ -49,7 +53,7 @@ class Poster:
             giphy_client = GiphyClient()
             bg_path = giphy_client.get_background(title_dir, title)
         else:
-            pexels_client = PexelsClient()
+            pexels_client = PexelsClient(query=title)
             bg_path = pexels_client.get_background_video(title_dir, title)
 
         # Join image and audio into a video
@@ -63,9 +67,12 @@ class Poster:
         )
 
         # Add captions
-        videomanager = DubbedVideoManager(dubbed_video, title_dir)
-        subtitle_generator = SubtitleGenerator(videomanager, title_dir)
+        video_manager = DubbedVideoManager(dubbed_video, title_dir)
+        subtitle_generator = SubtitleGenerator(video_manager, title_dir)
         subtitle_generator.attach()
+
+        # Cleanup video directory, leaving only the final video
+        cleanup_video_directory(final_file_path, title_dir)
 
         # Mark this video as used, completed successfully, if applicable
         if reuse_prompts is False:

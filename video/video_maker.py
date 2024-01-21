@@ -9,7 +9,7 @@ import moviepy.editor as mp
 from moviepy.video.fx.all import crop
 import sys
 sys.path.insert(0, '../post_bot/')
-from src.constants import VIDEO_RATIO_HEIGHTS
+from utils.constants import VIDEO_RATIO_HEIGHTS
 
 
 class VideoMaker:
