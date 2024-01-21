@@ -4,7 +4,6 @@ a random choice from results
 """
 
 import json
-
 from urllib import parse, request
 import requests
 import os
@@ -55,7 +54,7 @@ class GiphyClient:
                 break
             except IndexError:
                 print(
-                    f"[GIPHY ERROR] Could not find any {self.download_format} results for query '{self.query}'... "
+                    f"[GIPHY ERROR] Could not find any {self.download_format} results for query: '{self.query}'... "
                     f"Trying again! ({attempts}/{self.max_attempts} attempts)"
                 )
                 if attempts > self.max_attempts:

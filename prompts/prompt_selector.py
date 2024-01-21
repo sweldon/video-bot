@@ -31,7 +31,7 @@ class PromptSelector:
             if self.title is not None:
                 query = f"SELECT title, content FROM prompts where title='{self.title}'"
             else:
-                query = "SELECT title, content FROM prompts where content != '' and used != 1 ORDER BY RANDOM() LIMIT 1;"
+                query = "SELECT title, content FROM prompts where content != '' and used = 0 ORDER BY RANDOM() LIMIT 1;"
             res = prompt_cursor.cursor().execute(query)
             title, prompt = res.fetchone()
             

@@ -13,6 +13,7 @@ from video.video_maker import VideoMaker
 from video.captioner import DubbedVideoManager, SubtitleGenerator
 import os
 import shutil
+from clients.pexels import PexelsClient
 from clients.giphy import GiphyClient
 
 class Poster:
@@ -22,7 +23,8 @@ class Poster:
             sqllite_path,
             output_dir,
             reuse_prompts,
-            title
+            title,
+            bg_source
         ):
 
         # Get a random prompt
@@ -42,11 +44,16 @@ class Poster:
         # Voiceover duration dictates length of the video (background is looped if it's an image)
         audio_duration = speaker.get_duration(audio_file_path)
 
-        # Get a background image to be looped while voiceover runs
-        giphy_client = GiphyClient()
-        bg_path = giphy_client.get_background(title_dir, title)
+        # Get a background video/GIF to be looped while voiceover runs
+        if bg_source == "giphy":
+            giphy_client = GiphyClient()
+            bg_path = giphy_client.get_background(title_dir, title)
+        else:
+            pexels_client = PexelsClient()
+            bg_path = pexels_client.get_background_video(title_dir, title)
 
         # Join image and audio into a video
+        # TODO: add search terms col to database to pick more relevant background videos
         video_maker = VideoMaker()
         dubbed_video = video_maker.generate_video(
             audio_file_path,
@@ -69,8 +76,9 @@ class Poster:
 parser = argparse.ArgumentParser()
 parser.add_argument('--sqllite_path', type=str, required=True)
 parser.add_argument('--output_dir', type=str, required=True)
-parser.add_argument('--reuse_prompts', action='store_false')
+parser.add_argument('--reuse_prompts', action='store_true')
 parser.add_argument('--title', type=str)
+parser.add_argument('--bg_source', type=str, default="pexels")
 args = parser.parse_args()
 
 poster = Poster()
@@ -78,5 +86,6 @@ post = poster.generate_post(
     sqllite_path=args.sqllite_path,
     output_dir=args.output_dir,
     reuse_prompts=args.reuse_prompts,
-    title=args.title
+    title=args.title,
+    bg_source=args.bg_source
 )

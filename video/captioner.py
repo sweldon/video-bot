@@ -39,10 +39,7 @@ class SubtitleGenerator:
 
     def generate(self) -> None:
 
-        # model = whisper.load_model("base")
         temp_file = "%s.mp3" % os.path.join(self.title_dir, 'temp')
-
-
         model = stable_whisper.load_model('base')
         result = model.transcribe(temp_file)
 
