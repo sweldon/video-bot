@@ -16,21 +16,22 @@ import shutil
 from clients.pexels import PexelsClient
 from clients.giphy import GiphyClient
 from utils.helpers import cleanup_video_directory
+from typing import Tuple
 
 
 class Poster:
 
     def generate_post(
             self,
-            sqllite_path,
-            output_dir,
-            reuse_prompts,
-            title,
-            bg_source
-        ):
+            sqlite_path: str,
+            output_dir: str,
+            reuse_prompts: bool,
+            title: str,
+            bg_source: str
+        ) -> Tuple[str, str]:
 
         # Get a random prompt
-        prompt_selector = PromptSelector(sqllite_path, title)
+        prompt_selector = PromptSelector(sqlite_path, title)
         title, prompt = prompt_selector.select_prompt()
 
         # If the directory already exists, blow it away and start over
@@ -79,20 +80,62 @@ class Poster:
             print("Video successfully generated, flagging as used...")
             prompt_selector.mark_as_used(title)
 
+        return title, final_file_path
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--sqllite_path', type=str, required=True)
-parser.add_argument('--output_dir', type=str, required=True)
-parser.add_argument('--reuse_prompts', action='store_true')
-parser.add_argument('--title', type=str)
-parser.add_argument('--bg_source', type=str, default="pexels")
-args = parser.parse_args()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--sqlite_path',
+        type=str,
+        required=True,
+        help='Absolute path to SQLite file with prompts'
+    )
+    parser.add_argument(
+        '--output_dir',
+        type=str,
+        required=True,
+        help='Absolute path to where video directories will be made'
+    )
+    parser.add_argument(
+        '--reuse_prompts',
+        action='store_true',
+        help='If used, prompts will not be flagged as used in database and can be reused later'
+    )
+    parser.add_argument(
+        '--title',
+        type=str,
+        help='Specific title to query out of the prompts db and use for the video'
+    )
+    parser.add_argument(
+        '--bg_source',
+        type=str,
+        default="pexels",
+        help='Source of the background video. Current accepted values: giphy, pexels (default)'
+    )
+    parser.add_argument(
+        '--num_videos',
+        type=int,
+        default=1,
+        help='Number of videos to generate'
+    )
+    args = parser.parse_args()
 
-poster = Poster()
-post = poster.generate_post(
-    sqllite_path=args.sqllite_path,
-    output_dir=args.output_dir,
-    reuse_prompts=args.reuse_prompts,
-    title=args.title,
-    bg_source=args.bg_source
-)
+    poster = Poster()
+    num_videos = args.num_videos
+    num_generated = 0
+    print(f"Generating {num_videos} videos...")
+    for _ in range(num_videos):
+        try:
+            video_name, video_path = poster.generate_post(
+                sqlite_path=args.sqlite_path,
+                output_dir=args.output_dir,
+                reuse_prompts=args.reuse_prompts,
+                title=args.title,
+                bg_source=args.bg_source
+            )
+            print(f"Successfully generated video for '{video_name}' at {video_path}")
+            num_generated += 1
+        except Exception as e:
+            print(f"Could not generate video: {e}")
+
+    print(f"Videos generated: {num_generated}/{num_videos}")

@@ -12,3 +12,13 @@ VIDEO_RATIO_HEIGHTS = [
     2560,2688,2816,2944,3072,3200,3328,
     3456,3584,3712,3840,3968,4096
 ]
+
+ACCENTS_ENGLISH = [
+    "com.au",
+    "co.uk",
+    "us",
+    "ca",
+    "co.in",
+    "ie",
+    "co.za"
+]

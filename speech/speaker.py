@@ -9,6 +9,10 @@ from mutagen.mp3 import MP3
 import os
 from pydub import AudioSegment
 from typing import Optional
+import sys
+import random
+sys.path.insert(0, '../post_bot/')
+from utils.constants import ACCENTS_ENGLISH
 
 class Speaker:
 
@@ -19,9 +23,16 @@ class Speaker:
         language: str = 'en',
         speedup_multiplier: Optional[float] = None
     ) -> str:
-
+        """
+        Generates a voice-over of a prompt, and applies a random accent
+        from the English language
+        """
         file_path = "%s.mp3" % os.path.join(path, 'post_audio')
-        audio = gTTS(text=content, lang=language, slow=False)
+        random_accent_index = random.randint(0, len(ACCENTS_ENGLISH) - 1)
+        random_accent = ACCENTS_ENGLISH[random_accent_index]
+        print(f"Using accent: '{random_accent}'")
+
+        audio = gTTS(text=content, lang=language, slow=False, tld=random_accent)
         audio.save(file_path)
 
         if speedup_multiplier is not None:

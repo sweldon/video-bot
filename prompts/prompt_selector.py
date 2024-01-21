@@ -20,14 +20,14 @@ def prompt_db_manager(db_path):
 
 class PromptSelector:
 
-    def __init__(self, sqllite_path, title=None):
-        self.sqllite_path = sqllite_path
+    def __init__(self, sqlite_path, title=None):
+        self.sqlite_path = sqlite_path
         self.title=title
 
     def select_prompt(self):
         prompt = None
 
-        with prompt_db_manager(self.sqllite_path) as prompt_cursor:
+        with prompt_db_manager(self.sqlite_path) as prompt_cursor:
             if self.title is not None:
                 query = f"SELECT title, content FROM prompts where title='{self.title}'"
             else:
@@ -39,7 +39,7 @@ class PromptSelector:
 
     def get_all_prompts(self):
 
-        with prompt_db_manager(self.sqllite_path) as prompt_cursor:
+        with prompt_db_manager(self.sqlite_path) as prompt_cursor:
             res = prompt_cursor.cursor().execute(
                 "SELECT title, content FROM prompts where content != ''"
             )
@@ -47,7 +47,7 @@ class PromptSelector:
 
     def mark_as_used(self, title):
 
-        with prompt_db_manager(self.sqllite_path) as prompt_cursor:
+        with prompt_db_manager(self.sqlite_path) as prompt_cursor:
 
             prompt_cursor.cursor().execute(
                 f"UPDATE prompts SET used=1 WHERE title='{title}'"
