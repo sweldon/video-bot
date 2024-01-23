@@ -27,7 +27,8 @@ class Poster:
             output_dir: str,
             reuse_prompts: bool,
             title: str,
-            bg_source: str
+            bg_source: str,
+            pexels_download_link: str
         ) -> Tuple[str, str]:
 
         # Get a random prompt
@@ -54,7 +55,7 @@ class Poster:
             giphy_client = GiphyClient()
             bg_path = giphy_client.get_background(title_dir, title)
         else:
-            pexels_client = PexelsClient(query=title)
+            pexels_client = PexelsClient(query=title, download_link=pexels_download_link)
             bg_path = pexels_client.get_background_video(title_dir, title)
 
         # Join image and audio into a video
@@ -118,6 +119,11 @@ if __name__ == "__main__":
         default=1,
         help='Number of videos to generate'
     )
+    parser.add_argument(
+        '--pexels_download_link',
+        type=str,
+        help='Direct link to video to use as a background from Pexels'
+    )
     args = parser.parse_args()
 
     poster = Poster()
@@ -131,7 +137,8 @@ if __name__ == "__main__":
                 output_dir=args.output_dir,
                 reuse_prompts=args.reuse_prompts,
                 title=args.title,
-                bg_source=args.bg_source
+                bg_source=args.bg_source,
+                pexels_download_link=args.pexels_download_link
             )
             print(f"Successfully generated video for '{video_name}' at {video_path}")
             num_generated += 1

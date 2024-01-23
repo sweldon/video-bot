@@ -17,7 +17,8 @@ class PexelsClient:
         search_limit = 3,
         query = "space",
         min_width = 1280,
-        min_height = 720
+        min_height = 720,
+        download_link = None
     ):
         self.endpoint = endpoint
         self.api_key = os.environ["PEXELS_API_KEY"]
@@ -26,6 +27,7 @@ class PexelsClient:
         self.min_width = min_width
         self.min_height = min_height
         self.max_attempts = 20
+        self.download_link = download_link
         self.params = parse.urlencode({
             "query": query,
             "per_page": self.search_limit,
@@ -35,7 +37,7 @@ class PexelsClient:
         opener =request.build_opener()
         opener.addheaders = [('Authorization', self.api_key)]
         request.install_opener(opener)
-        download_link = f"https://www.pexels.com/download/video/{video_id}/?h={height}&w={width}"
+        download_link = self.download_link or f"https://www.pexels.com/download/video/{video_id}/?h={height}&w={width}"
         download_path = "%s.mp4" % (os.path.join(output_dir, title+"_bg"))
         request.urlretrieve(download_link, download_path) 
         return download_path
@@ -121,7 +123,7 @@ class PexelsClient:
                     )
                     self.params = parse.urlencode({
                         "query": "space",
-                        "per_page": 20,
+                        "per_page": 80,
                     })
 
                 if attempts > self.max_attempts:
