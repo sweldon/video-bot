@@ -1,5 +1,5 @@
 # Video Bot
-A bot that uses ChatGPT-generated prompts and creates social media-ready videos with AI-generated captions and voice-overs. The prompts are stored in and queried from an SQLite database, and then used to generate a voice-over using gTTS (Google Text-to-Speech). The prompt topic is then used to search and download a relevant background for the video, which can be either another video (royalty free via the Pexels API), GIF (Giphy API) or a random image from a given directory. Finally, subtitles are generated and added based on the voice-over using OpenAPI Whisper. It's all brought together using moviepy.
+A bot that uses ChatGPT-generated prompts and creates social media-ready videos with AI-generated captions and voice-overs. The prompts are stored in and queried from an SQLite database, and then used to generate a voice-over using gTTS (Google Text-to-Speech). The prompt topic is then used to search and download a relevant background for the video, which can be either another video (royalty free via the Pexels API), GIF (Giphy API) or a random image from a given directory. Finally, subtitles are generated and added based on the voice-over using OpenAI Whisper. It's all brought together using moviepy.
 
 ## Setup (Ubuntu / Windows + WSL2)
 1. Create your Python virtual environment
