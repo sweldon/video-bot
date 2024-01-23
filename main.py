@@ -1,12 +1,9 @@
 """
 Chooses a prompt from a database, generates a voiceover, chooses
-a background image, generates captions, and then combines them into
+a background video, generates captions, and then combines it all into
 a video
 """
 
-import sys
-sys.path.insert(0, '../post_bot/')
-import argparse
 from prompts.prompt_selector import PromptSelector
 from speech.speaker import Speaker
 from video.video_maker import VideoMaker
@@ -17,9 +14,10 @@ from clients.pexels import PexelsClient
 from clients.giphy import GiphyClient
 from utils.helpers import cleanup_video_directory
 from typing import Tuple
+from utils.arg_processor import process_args
 
 
-class Poster:
+class VideoBot:
 
     def generate_post(
             self,
@@ -83,54 +81,14 @@ class Poster:
 
         return title, final_file_path
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--sqlite_path',
-        type=str,
-        required=True,
-        help='Absolute path to SQLite file with prompts'
-    )
-    parser.add_argument(
-        '--output_dir',
-        type=str,
-        required=True,
-        help='Absolute path to where video directories will be made'
-    )
-    parser.add_argument(
-        '--reuse_prompts',
-        action='store_true',
-        help='If used, prompts will not be flagged as used in database and can be reused later'
-    )
-    parser.add_argument(
-        '--title',
-        type=str,
-        help='Specific title to query out of the prompts db and use for the video'
-    )
-    parser.add_argument(
-        '--bg_source',
-        type=str,
-        default="pexels",
-        help='Source of the background video. Current accepted values: giphy, pexels (default)'
-    )
-    parser.add_argument(
-        '--num_videos',
-        type=int,
-        default=1,
-        help='Number of videos to generate'
-    )
-    parser.add_argument(
-        '--pexels_download_link',
-        type=str,
-        help='Direct link to video to use as a background from Pexels'
-    )
-    args = parser.parse_args()
 
-    poster = Poster()
+if __name__ == "__main__":
+    args = process_args()
+    poster = VideoBot()
     num_videos = args.num_videos
     num_generated = 0
     print(f"Generating {num_videos} videos...")
-    for _ in range(num_videos):
+    for video_number in range(num_videos):
         try:
             video_name, video_path = poster.generate_post(
                 sqlite_path=args.sqlite_path,
@@ -140,9 +98,9 @@ if __name__ == "__main__":
                 bg_source=args.bg_source,
                 pexels_download_link=args.pexels_download_link
             )
-            print(f"Successfully generated video for '{video_name}' at {video_path}")
+            print(f"({video_number}/{num_videos}) Successfully generated video for '{video_name}' at {video_path}")
             num_generated += 1
         except Exception as e:
             print(f"Could not generate video: {e}")
 
-    print(f"Videos generated: {num_generated}/{num_videos}")
+    print(f"Total videos generated: {num_generated}/{num_videos}")

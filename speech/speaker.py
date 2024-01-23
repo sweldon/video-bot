@@ -2,17 +2,15 @@
 Given a prompt, generates a voiceover for the video
 """
 
-
 from gtts import gTTS 
 import os  
 from mutagen.mp3 import MP3
 import os
 from pydub import AudioSegment
 from typing import Optional
-import sys
 import random
-sys.path.insert(0, '../post_bot/')
 from utils.constants import ACCENTS_ENGLISH
+
 
 class Speaker:
 

@@ -7,8 +7,6 @@ to a popular social media aspect ratio (9:16)
 import os
 import moviepy.editor as mp
 from moviepy.video.fx.all import crop
-import sys
-sys.path.insert(0, '../post_bot/')
 from utils.constants import VIDEO_RATIO_HEIGHTS
 
 

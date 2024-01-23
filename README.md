@@ -48,6 +48,8 @@ gTTS, and finally combines them into a video
 - title: If specified, will generate a video from the database matching this title
 - bg_source: Source to use for background videos. Valid options are: `giphy`, `pexels`
 - reuse_prompts: If this flag is provided, videos will not be flagged as used in the database, allowing you to regenerate them. Otherwise, you can only generate a video for a prompt once so theyre not duplicated
+- num_videos: Number of videos to generate, usefull for generating vids in bulk.
+- pexels_download_link: If you know the video you want to use, you can provide the download link here.
 
 ## SQLite Database
 - [INT] id

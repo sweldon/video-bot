@@ -38,6 +38,7 @@ class PexelsClient:
         opener.addheaders = [('Authorization', self.api_key)]
         request.install_opener(opener)
         download_link = self.download_link or f"https://www.pexels.com/download/video/{video_id}/?h={height}&w={width}"
+        print(f"Downloading video from: {download_link}")
         download_path = "%s.mp4" % (os.path.join(output_dir, title+"_bg"))
         request.urlretrieve(download_link, download_path) 
         return download_path
