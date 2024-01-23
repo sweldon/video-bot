@@ -34,7 +34,7 @@ class PexelsClient:
         })
 
     def download_video(self, video_id, output_dir, title, height, width):
-        opener =request.build_opener()
+        opener = request.build_opener()
         opener.addheaders = [('Authorization', self.api_key)]
         request.install_opener(opener)
         download_link = self.download_link or f"https://www.pexels.com/download/video/{video_id}/?h={height}&w={width}"
