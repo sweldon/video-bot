@@ -12,9 +12,11 @@ import os
 import shutil
 from clients.pexels import PexelsClient
 from clients.giphy import GiphyClient
+from clients.tiktok import TikTokUploader
 from utils.helpers import cleanup_video_directory
 from typing import Tuple
 from utils.arg_processor import process_args
+import datetime
 
 
 class VideoBot:
@@ -26,12 +28,14 @@ class VideoBot:
             reuse_prompts: bool,
             title: str,
             bg_source: str,
-            pexels_download_link: str
+            pexels_download_link: str,
+            post_date_time: datetime,
+            tiktok_cookie_path: str
         ) -> Tuple[str, str]:
 
         # Get a random prompt
         prompt_selector = PromptSelector(sqlite_path, title)
-        title, prompt = prompt_selector.select_prompt()
+        title, prompt, post_description = prompt_selector.select_prompt()
 
         # If the directory already exists, blow it away and start over
         title_dir = f"{output_dir}{title}"
@@ -71,6 +75,15 @@ class VideoBot:
         subtitle_generator = SubtitleGenerator(video_manager, title_dir)
         subtitle_generator.attach()
 
+        # Upload to TikTok
+        tiktok_uploader = TikTokUploader()
+        tiktok_uploader.post_video(
+            final_file_path,
+            post_description,
+            tiktok_cookie_path,
+            post_date_time
+        )
+
         # Cleanup video directory, leaving only the final video
         cleanup_video_directory(final_file_path, title_dir)
 
@@ -86,9 +99,11 @@ if __name__ == "__main__":
     args = process_args()
     poster = VideoBot()
     num_videos = args.num_videos
+    scheduled_times = args.post_date_times
     num_generated = 0
     print(f"Generating {num_videos} videos...")
     for video_number in range(num_videos):
+        post_time = scheduled_times[video_number]
         try:
             video_name, video_path = poster.generate_post(
                 sqlite_path=args.sqlite_path,
@@ -96,7 +111,9 @@ if __name__ == "__main__":
                 reuse_prompts=args.reuse_prompts,
                 title=args.title,
                 bg_source=args.bg_source,
-                pexels_download_link=args.pexels_download_link
+                pexels_download_link=args.pexels_download_link,
+                post_date_time=post_time,
+                tiktok_cookie_path=args.tiktok_cookie_path
             )
             print(f"({video_number}/{num_videos}) Successfully generated video for '{video_name}' at {video_path}")
             num_generated += 1

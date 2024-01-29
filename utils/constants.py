@@ -22,3 +22,30 @@ ACCENTS_ENGLISH = [
     "ie",
     "co.za"
 ]
+
+TIKTOK_HASHTAGS = [
+    "#Space",
+    "#Astrology",
+    "#fyp",
+    "#Rockets",
+    "#Aliens",
+    "#SpaceX",
+    "#Cosmos",
+    "#Stargazing",
+    "#NASA",
+    "#Galaxy",
+    "#Astronomy",
+    "#Universe",
+    "#SpaceExploration",
+    "#Starlight",
+    "#Celestial",
+    "#SpaceFacts",
+    "#MeteorShower",
+    "#SpaceMagic",
+    "#AstroPhotography",
+    "#BlackHole",
+    "#CosmicWonders",
+    "#Planetarium",
+    "#ExploreTheGalaxy",
+    "#SpaceGeek",
+]

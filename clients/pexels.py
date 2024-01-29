@@ -14,7 +14,7 @@ class PexelsClient:
     def __init__(
         self,
         endpoint = "https://api.pexels.com/videos/search",
-        search_limit = 3,
+        search_limit = 1,
         query = "space",
         min_width = 1280,
         min_height = 720,

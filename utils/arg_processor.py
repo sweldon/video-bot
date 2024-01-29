@@ -3,6 +3,7 @@ Handle arguments from user input
 """
 
 import argparse
+import datetime
 
 def process_args():
     parser = argparse.ArgumentParser()
@@ -45,6 +46,19 @@ def process_args():
         '--pexels_download_link',
         type=str,
         help='Direct link to video to use as a background from Pexels'
+    )
+    parser.add_argument(
+        '--post_date_times',
+        type=lambda s: [datetime.datetime.strptime(dt, '%Y-%m-%d-%H-%M') for dt in s.split(",")] if s else None,
+        help=(
+            'Comma-delimited list of scheduled naive times to post videos, in the format YYYY-MM-DD-HH-MM. '
+            'The number of times provided should match the `num_videos` parameter.'
+        )
+    )
+    parser.add_argument(
+        '--tiktok_cookie_path',
+        type=str,
+        help='Path to file storing TikTok session cookie for posting authentication'
     )
     args = parser.parse_args()
     return args

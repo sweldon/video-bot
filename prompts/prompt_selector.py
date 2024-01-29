@@ -29,13 +29,13 @@ class PromptSelector:
 
         with prompt_db_manager(self.sqlite_path) as prompt_cursor:
             if self.title is not None:
-                query = f"SELECT title, content FROM prompts where title='{self.title}'"
+                query = f"SELECT title, content, description FROM prompts where title='{self.title}'"
             else:
-                query = "SELECT title, content FROM prompts where content != '' and used = 0 ORDER BY RANDOM() LIMIT 1;"
+                query = "SELECT title, content, description FROM prompts where used = 0 ORDER BY RANDOM() LIMIT 1;"
             res = prompt_cursor.cursor().execute(query)
-            title, prompt = res.fetchone()
+            title, prompt, description = res.fetchone()
             
-        return title, prompt
+        return title, prompt, description
 
     def get_all_prompts(self):
 
